@@ -1,0 +1,77 @@
+import pandas as pd
+from sklearn.datasets import load_iris
+iris = load_iris()
+
+dir(iris)
+
+# features_names is a list of all the x
+iris.feature_names
+
+# add all x in DF
+df = pd.DataFrame(iris.data, columns=iris.feature_names)
+df.head()
+
+# add y (target) col in DF
+# iris.target_name: 0: setosa, 1: versicolor, 2: virginiva
+df['target'] = iris.target
+df.head()
+
+# .count entries having 1 i,e having verisclor as species in dataset
+df[df.target==1].head() 
+
+# hence 0-50 is setoca
+# 51-100 is sepecies2
+# 
+
+# create flower col to avoid confusion 
+
+# for each value in target col (lambda)
+# it will return the name of x, iris.target_names[x]
+df['flower_name'] = df.target.apply(lambda x: iris.target_names[x])
+df.head()
+
+# Visualisation part 
+# basically checking if we can visually draw a boundary
+# or how easy we can see the distinction
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+
+df0 = df[:50]
+df1 = df[50:100]
+df2 = df[100:]
+
+# Sepal length vs Sepal Width (Setosa vs Versicolor)
+plt.xlabel('Sepal Length')
+plt.ylabel('Sepal Width')
+plt.scatter(df0['sepal length (cm)'], df0['sepal width (cm)'],
+            color="green", marker='+')
+plt.scatter(df1['sepal length (cm)'], df1['sepal width (cm)'], color="blue", marker='.')
+
+# Petal length vs Pepal Width (Setosa vs Versicolor)
+plt.xlabel('Petal Length')
+plt.ylabel('Petal Width')
+plt.scatter(df0['petal length (cm)'], df0['petal width (cm)'],
+            color="green", marker='+')
+plt.scatter(df1['petal length (cm)'],
+            df1['petal width (cm)'], color="blue", marker='.')
+
+# Actual SVM training 
+
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+
+# getting only feature columns in X
+X = df.drop(['target', 'flower_name'], axis='columns')
+y = df.target
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# creating SVM classifier
+model = SVC()
+
+# training model
+model.fit(X_train, y_train) 
+
+# finding accuracy
+model.score(X_test, y_test)
